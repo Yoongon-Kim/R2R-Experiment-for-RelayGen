@@ -23,7 +23,6 @@
 *.arrow-lock
 *.mdc
 *.whl
-*.sh
 *.svg
 *.code-workspace
 *.parquet
