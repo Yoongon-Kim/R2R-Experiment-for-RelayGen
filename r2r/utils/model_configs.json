@@ -4,14 +4,14 @@
     "think_end": 151649
   },
   "quick": {
-    "model_name": "DeepSeek-R1-Distill-Qwen-1.5B",
-    "model_path": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
-    "param": "1.5",
+    "model_name": "Qwen3-1.7B",
+    "model_path": "Qwen/Qwen3-1.7B",
+    "param": "1.7",
     "mem_fraction_static": 0.15
   },
   "reference": {
-    "model_name": "DeepSeek-R1-Distill-Qwen-32B",
-    "model_path": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+    "model_name": "Qwen3-32B",
+    "model_path": "Qwen/Qwen3-32B",
     "param": "32",
     "mem_fraction_static": 0.80
   },
@@ -38,5 +38,8 @@
     "max_new_tokens": 16,
     "base_gpu_id": 4,
     "tp_size": 4
+  },
+  "router": {
+    "pretrained_model_name": "Qwen/Qwen3-1.7B"
   }
 }

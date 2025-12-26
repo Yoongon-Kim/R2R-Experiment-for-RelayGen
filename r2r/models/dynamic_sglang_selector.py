@@ -112,6 +112,11 @@ class DynamicSimpleSGLangSelector:
         self.warm_up_reference_model()
 
         # Initialize switching strategy
+        # Add pretrained_model_name from config if using neural strategy and not already specified
+        if switching_strategy == 'neural' and 'pretrained_model_name' not in self.strategy_kwargs:
+            if 'router' in MODEL_DICT and 'pretrained_model_name' in MODEL_DICT['router']:
+                self.strategy_kwargs['pretrained_model_name'] = MODEL_DICT['router']['pretrained_model_name']
+
         self.switching_strategy = create_switching_strategy(
             switching_strategy, **self.strategy_kwargs
         )

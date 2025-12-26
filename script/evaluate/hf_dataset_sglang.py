@@ -102,11 +102,11 @@ def parse_args():
     # Generation configuration
     parser.add_argument('--max_new_tokens', type=int, default=32768,
                       help='Maximum number of new tokens to generate')
-    parser.add_argument('--temperature', type=float, default=0.0,
+    parser.add_argument('--temperature', type=float, default=0.6,
                       help='Temperature for the model')
-    parser.add_argument('--top_p', type=float, default=1.0,
+    parser.add_argument('--top_p', type=float, default=0.95,
                       help='Top-p for the model')
-    parser.add_argument('--top_k', type=int, default=-1,
+    parser.add_argument('--top_k', type=int, default=20,
                     help='Top-k filtering parameter for sampling (default: -1)')
     parser.add_argument('--beam_size', type=int, default=3,
                       help='Beam size for tree-based generation')

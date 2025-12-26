@@ -243,6 +243,7 @@ def load_model(model_path: str, device: str = "cuda", **kwargs) -> tuple[nn.Modu
     Args:
         model_path: Path to the saved model
         device: Device to load the model to
+        **kwargs: Additional arguments to override init_args (e.g., pretrained_model_name)
 
     Returns:
         The loaded model and its configuration
@@ -258,6 +259,9 @@ def load_model(model_path: str, device: str = "cuda", **kwargs) -> tuple[nn.Modu
     init_args = model_config.pop("init_args", {})
     common_args = model_config.pop("common_args", {})
     model_specific_args = model_config.pop("model_specific_args", {})
+
+    # Allow overriding init_args with kwargs (e.g., to fix pretrained_model_name)
+    init_args.update(kwargs)
 
     # Create model with init_args
     dtype = model_config.get("training", {}).pop("dtype", None)

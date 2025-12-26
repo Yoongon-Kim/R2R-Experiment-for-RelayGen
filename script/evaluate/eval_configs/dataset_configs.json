@@ -6,7 +6,7 @@
         "id_field": "ID",
         "question_field": "Problem",
         "answer_field": "Answer",
-        "prompt_template": "{question}",
+        "prompt_template": "Solve the following math problem efficiently and clearly. Please reason step by step, separate logical reasoning steps with two newline characters (\n\n), and put your final answer within \\boxed{{}}. Problem:{question}",
         "description": "American Invitational Mathematics Examination problems with numerical answers from 2024 to 2025"
     },
     "aime23": {
@@ -16,7 +16,7 @@
         "id_field": "ID",
         "question_field": "Question",
         "answer_field": "Answer",
-        "prompt_template": "{question}",
+        "prompt_template": "Solve the following math problem efficiently and clearly. Please reason step by step, separate logical reasoning steps with two newline characters (\n\n), and put your final answer within \\boxed{{}}. Problem:{question}",
         "description": "American Invitational Mathematics Examination problems with numerical answers from 1983 to 2024",
         "filter": {
             "key": "Year",
@@ -30,8 +30,18 @@
         "id_field": "ID",
         "question_field": "Problem",
         "answer_field": "Answer",
-        "prompt_template": "{question}",
+        "prompt_template": "Solve the following math problem efficiently and clearly. Please reason step by step, separate logical reasoning steps with two newline characters (\n\n), and put your final answer within \\boxed{{}}. Problem:{question}",
         "description": "American Invitational Mathematics Examination problems with numerical answers"
+    },
+    "math500": {
+        "name": "MATH-500 Problem Set",
+        "path": "hendrycks/math_500",
+        "answer_type": "boxed",
+        "id_field": "problem_id",
+        "question_field": "problem",
+        "answer_field": "solution",
+        "prompt_template": "Solve the following math problem efficiently and clearly. Please reason step by step, separate logical reasoning steps with two newline characters (\n\n), and put your final answer within \\boxed{{}}. Problem:{question}",
+        "description": "Subset of 500 challenging competition-level math problems from the MATH dataset, covering algebra, geometry, number theory, and calculus"
     },
     "gpqa": {
         "name": "GPQA Diamond Multiple Choice",
@@ -76,7 +86,7 @@
         "id_field": "id",
         "question_field": "problem",
         "answer_field": "answer",
-        "prompt_template": "{question}",
+        "prompt_template": "Solve the following math problem efficiently and clearly. Please reason step by step, separate logical reasoning steps with two newline characters (\n\n), and put your final answer within \\boxed{{}}. Problem:{question}",
         "description": "American Invitational Mathematics Examination problems with numerical answers"
     },
     "livecodebench": {

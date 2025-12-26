@@ -1,5 +1,3 @@
-conda create -n r2r python=3.10
-conda activate r2r
 pip install -e .
 pip install packaging annotated_types psutil pyyaml
 pip install setproctitle
