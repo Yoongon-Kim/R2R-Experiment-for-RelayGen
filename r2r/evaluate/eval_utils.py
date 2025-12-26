@@ -9,14 +9,18 @@ import numpy as np
 ## USED FOR GPQA ###
 
 QUERY_TEMPLATE_MULTICHOICE = """
-Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of ABCD. Think step by step before answering.
+What is the correct answer to the following problem? Please reason step by step. 
+Separate logical reasoning steps with two newline characters (\n\n).
+Put the final answer **strictly** in the format \\boxed{{X}}, where X is a single letter (A, B, C, or D).
 
-{Question}
+**Example output:** \\boxed{{A}}
 
-A) {A}
-B) {B}
-C) {C}
-D) {D}
+Problem: {Question}
+Choices:
+(A) {A}
+(B) {B}
+(C) {C}
+(D) {D}
 """.strip()
 
 ANSWER_PATTERN_MULTICHOICE = r"(?i)Answer[ \t]*:[ \t]*\$?([A-D])\$?"
@@ -242,8 +246,10 @@ def prepare_multiple_choice_prompt(line: dict[str, Any], format_config: dict[str
     if len(options_fields) >= 4:  # Need at least 4 options for A, B, C, D
         # Get the options in a consistent order
         options = [line[field] for field in options_fields]
+        
+        correct_index = 0 # Not using randomized option
                 
-        # Shuffle the options to randomize the correct answer position
+        """# Shuffle the options to randomize the correct answer position
         # Create a mapping from original positions to shuffled positions
         indices = list(range(len(options)))
         np.random.shuffle(indices)
@@ -251,14 +257,14 @@ def prepare_multiple_choice_prompt(line: dict[str, Any], format_config: dict[str
         shuffled_options = [options[i] for i in indices]
                 
         # Find where the correct answer ended up
-        correct_index = indices.index(0)  # Assuming the first option is the correct one
+        correct_index = indices.index(0)  # Assuming the first option is the correct one"""
         correct_letter = chr(65 + correct_index)  # A, B, C, D...
                 
         options = {
-            "A": shuffled_options[0],
-            "B": shuffled_options[1],
-            "C": shuffled_options[2],
-            "D": shuffled_options[3]
+            "A": options[0], # shuffled_options[0],
+            "B": options[1], # shuffled_options[1],
+            "C": options[2], # shuffled_options[2],
+            "D": options[3] # shuffled_options[3]
         }
         answer = correct_letter
 
