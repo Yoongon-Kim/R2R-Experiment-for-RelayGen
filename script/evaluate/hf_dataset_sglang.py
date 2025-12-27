@@ -792,22 +792,23 @@ def preprocess_dataset(dataset, dataset_config: Dict, save_result_dir: str) -> L
                 # Get the options in a consistent order
                 options = [item[field] for field in options_fields]
                 
-                # Shuffle the options to randomize the correct answer position
+                # Yoon changed this to set the right answer as the option A.
+                """# Shuffle the options to randomize the correct answer position
                 # Create a mapping from original positions to shuffled positions
                 indices = list(range(len(options)))
                 np.random.shuffle(indices)
                 
-                shuffled_options = [options[i] for i in indices]
+                shuffled_options = [options[i] for i in indices]"""
                 
                 # Find where the correct answer ended up
-                correct_index = indices.index(0)  # Assuming the first option is the correct one
+                correct_index = 0 # indices.index(0)  # Assuming the first option is the correct one
                 correct_letter = chr(65 + correct_index)  # A, B, C, D...
                 
                 processed_item["Options"] = {
-                    "A": shuffled_options[0],
-                    "B": shuffled_options[1],
-                    "C": shuffled_options[2],
-                    "D": shuffled_options[3]
+                    "A": options[0], # shuffled_options[0],
+                    "B": options[1], # shuffled_options[1],
+                    "C": options[2], # shuffled_options[2],
+                    "D": options[3] # shuffled_options[3]
                 }
                 processed_item["Answer"] = correct_letter
                 

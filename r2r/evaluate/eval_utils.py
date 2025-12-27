@@ -76,14 +76,25 @@ def extract_boxed_answer(text: str) -> Tuple[str, bool]:
     return "", False
 
 def extract_multiple_choice_answer(text: str) -> Tuple[str, bool]:
-    """Extract multiple-choice answer (A, B, C, or D) from the generated text."""
-    # Look for answer statements like "The answer is A" or "I choose B"
+    # """Extract multiple-choice answer (A, B, C, or D) from the generated text."""
+    # # Look for answer statements like "The answer is A" or "I choose B"
     
-    match = re.search(ANSWER_PATTERN_MULTICHOICE, text)
+    # match = re.search(ANSWER_PATTERN_MULTICHOICE, text)
+    # if match:
+    #     choice = match.group(1).upper()  # Convert to uppercase
+    #     return choice, True
+    
+    # return "", False
+    """Extract answer from \boxed{...} and check if it's a valid number.""" # Yoon added this to correctly get answer for gpqa dataset becuase Yoon changed the prompt for gpqa
+    pattern = r"\\boxed{([^}]*)}"
+    match = re.search(pattern, text)
     if match:
-        choice = match.group(1).upper()  # Convert to uppercase
-        return choice, True
-    
+        answer = match.group(1).strip()
+        # Try to convert to int, return None if fails
+        try:
+            return answer, True
+        except:
+            return answer, False
     return "", False
 
 def dummy_extract_code_answer(text: str) -> Tuple[str, bool]:
