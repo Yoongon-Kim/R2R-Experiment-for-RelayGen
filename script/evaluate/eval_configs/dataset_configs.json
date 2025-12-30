@@ -35,9 +35,9 @@
     },
     "math500": {
         "name": "MATH-500 Problem Set",
-        "path": "hendrycks/math_500",
+        "path": "HuggingFaceH4/MATH-500",
         "answer_type": "boxed",
-        "id_field": "problem_id",
+        "id_field": "unique_id",
         "question_field": "problem",
         "answer_field": "solution",
         "prompt_template": "Solve the following math problem efficiently and clearly. Please reason step by step, separate logical reasoning steps with two newline characters (\n\n), and put your final answer within \\boxed{{}}. Problem:{question}",
