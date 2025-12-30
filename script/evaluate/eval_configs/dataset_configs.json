@@ -39,7 +39,7 @@
         "answer_type": "boxed",
         "id_field": "unique_id",
         "question_field": "problem",
-        "answer_field": "solution",
+        "answer_field": "answer",
         "prompt_template": "Solve the following math problem efficiently and clearly. Please reason step by step, separate logical reasoning steps with two newline characters (\n\n), and put your final answer within \\boxed{{}}. Problem:{question}",
         "description": "Subset of 500 challenging competition-level math problems from the MATH dataset, covering algebra, geometry, number theory, and calculus"
     },

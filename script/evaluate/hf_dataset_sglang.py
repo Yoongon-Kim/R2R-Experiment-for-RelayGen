@@ -579,7 +579,7 @@ def evaluate_problem(
                 problem_id_counts[problem_id] = 1
                 run_number = 1
             
-            problem_id.replace("/", "_").removesuffix(".json")
+            problem_id=problem_id.replace("/", "_").removesuffix(".json")
             temp_output_path = os.path.join(temp_dir, f"{problem_id}_run_{run_number}.txt")
             temp_output_csv_path = os.path.join(temp_csv_dir, f"{problem_id}_run_{run_number}.csv")
             write_to_file(temp_output_path, result)
