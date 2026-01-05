@@ -28,6 +28,8 @@ from datetime import datetime
 from typing import List, Dict, Any
 import statistics
 
+import asyncio
+
 import torch
 import pandas as pd
 import multiprocessing as mp
@@ -142,7 +144,39 @@ class BaselineGenerator:
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
         print("Baseline model initialized successfully")
 
-    def generate(self, prompt: str, max_new_tokens: int = 2048,
+    def warmup(self):
+        """Warmup the model to compile CUDA graphs and initialize GPU caches.
+
+        This prevents the first benchmark run from including model loading overhead.
+        """
+        print("Warming up baseline model...")
+
+        # Set up event loop for warmup
+        try:
+            asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        # Create a simple warmup prompt
+        warmup_prompt = "Hi"
+        messages = [{"role": "user", "content": warmup_prompt}]
+        formatted_prompt = self.tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+
+        # Run a short generation to warmup
+        sampling_params = {
+            "max_new_tokens": 10,
+            "temperature": 0.6,
+            "top_p": 0.95,
+            "top_k": 20,
+        }
+
+        _ = self.engine.generate([formatted_prompt], sampling_params=sampling_params)
+        print("Baseline model warmup complete!")
+
+    def generate(self, prompt: str, max_new_tokens: int = 32768,
                  temperature: float = 0.6, top_p: float = 0.95, top_k: int = 20) -> Dict[str, Any]:
         """Generate response for a single prompt.
 
@@ -156,6 +190,13 @@ class BaselineGenerator:
         Returns:
             Dictionary containing generation results and metrics
         """
+        # Set up event loop if needed
+        try:
+            asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
         # Apply chat template
         messages = [{"role": "user", "content": prompt}]
         formatted_prompt = self.tokenizer.apply_chat_template(
@@ -206,7 +247,7 @@ class BaselineGenerator:
 class R2RGenerator:
     """R2R generator using dynamic model selection."""
 
-    def __init__(self, router_path: str, tp_size: int = 2, threshold: float = 0.9):
+    def __init__(self, router_path: str, tp_size: int = 2, threshold: float = 0.40595959595959596):
         """Initialize R2R generator.
 
         Args:
@@ -244,7 +285,44 @@ class R2RGenerator:
         self.tokenizer = self.engine.tokenizer
         print("R2R generator initialized successfully")
 
-    def generate(self, prompt: str, max_new_tokens: int = 2048,
+    def warmup(self):
+        """Warmup the R2R models to compile CUDA graphs and initialize GPU caches.
+
+        This prevents the first benchmark run from including model loading overhead.
+        Note: R2R already has internal warmup in DynamicSimpleSGLangSelector.__init__(),
+        but we add an additional warmup here to ensure full readiness.
+        """
+        print("Warming up R2R models...")
+
+        # Set up event loop for warmup
+        try:
+            asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        # Create a simple warmup prompt
+        warmup_prompt = "Hi"
+        messages = [{"role": "user", "content": warmup_prompt}]
+        formatted_prompt = self.tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+
+        input_ids = [self.tokenizer.encode(formatted_prompt)]
+
+        # Run a short generation to warmup
+        _ = self.engine.generate(
+            input_ids,
+            max_new_tokens=10,
+            temperature=0.6,
+            top_p=0.95,
+            top_k=20,
+            record_generation=False,
+            print_tokens=False,
+        )
+        print("R2R models warmup complete!")
+
+    def generate(self, prompt: str, max_new_tokens: int = 32768,
                  temperature: float = 0.6, top_p: float = 0.95, top_k: int = 20) -> Dict[str, Any]:
         """Generate response for a single prompt.
 
@@ -258,6 +336,13 @@ class R2RGenerator:
         Returns:
             Dictionary containing generation results and metrics
         """
+        # Set up event loop if needed
+        try:
+            asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
         # Apply chat template
         messages = [{"role": "user", "content": prompt}]
         formatted_prompt = self.tokenizer.apply_chat_template(
@@ -319,7 +404,7 @@ class R2RGenerator:
 
 
 def run_benchmark(problems: List[Dict], generator: Any, num_runs: int = 5,
-                  max_new_tokens: int = 2048, temperature: float = 0.6,
+                  max_new_tokens: int = 32768, temperature: float = 0.6,
                   top_p: float = 0.95, top_k: int = 20) -> List[Dict]:
     """Run benchmark on problems using the given generator.
 
@@ -542,7 +627,7 @@ def main():
                        default='Qwen/Qwen3-32B',
                        help='Path to baseline large model (default: Qwen/Qwen3-32B)')
     parser.add_argument('--router_path', type=str,
-                       default='resource/default_router.pt',
+                       default='resource/qwen3_1.7_8_router.pt',
                        help='Path to R2R router model (default: resource/default_router.pt)')
 
     # Test configuration
@@ -554,7 +639,7 @@ def main():
                        help='Number of runs per problem (default: 5)')
 
     # Generation parameters
-    parser.add_argument('--max_new_tokens', type=int, default=2048,
+    parser.add_argument('--max_new_tokens', type=int, default=32768,
                        help='Maximum tokens to generate (default: 2048)')
     parser.add_argument('--temperature', type=float, default=0.6,
                        help='Sampling temperature (default: 0.6)')
@@ -568,7 +653,7 @@ def main():
                        help='Tensor parallelism size (default: 2)')
 
     # R2R configuration
-    parser.add_argument('--threshold', type=float, default=0.9,
+    parser.add_argument('--threshold', type=float, default=0.40595959595959596,
                        help='Neural router threshold (default: 0.9)')
 
     # Output
@@ -595,6 +680,7 @@ def main():
     print(f"  Top-p:              {args.top_p}")
     print(f"  Top-k:              {args.top_k}")
     print(f"  Tensor parallel:    {args.tp_size}")
+    print(f". Threshold:          {args.threshold}")
     print("="*80)
 
     # Load problems using dataset configuration
@@ -613,6 +699,9 @@ def main():
             model_path=args.baseline_model_path,
             tp_size=args.tp_size
         )
+
+        # Warmup the model before benchmarking
+        baseline_generator.warmup()
 
         baseline_results = run_benchmark(
             problems=problems,
@@ -638,6 +727,9 @@ def main():
             tp_size=args.tp_size,
             threshold=args.threshold,
         )
+
+        # Warmup the model before benchmarking
+        r2r_generator.warmup()
 
         r2r_results = run_benchmark(
             problems=problems,
@@ -682,17 +774,16 @@ if __name__ == "__main__":
         print("WARNING: CUDA not available")
 
     mp.set_start_method("spawn", force=True)
-
-    # Set up event loop policy FIRST, then create loop
+    
     try:
         import uvloop
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-        # Create loop AFTER setting policy
-        loop = uvloop.new_event_loop()
-        asyncio.set_event_loop(loop)
     except ImportError:
-        # Fallback to default asyncio
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+        pass
 
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        import traceback
+        traceback.print_exc()

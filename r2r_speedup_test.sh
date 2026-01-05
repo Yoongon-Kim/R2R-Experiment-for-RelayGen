@@ -10,21 +10,21 @@
 # Path to your baseline large model
 # Default: "Qwen/Qwen3-32B" (same as R2R reference model)
 # You can change this to any HuggingFace model, e.g., "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
-BASELINE_MODEL_PATH="Qwen/Qwen3-32B"
+BASELINE_MODEL_PATH="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
 
 # Path to your R2R router model
-ROUTER_PATH="resource/default_router.pt"
+ROUTER_PATH="resource/r1_1.5_32_router.pt"
 
 # Output directory
-OUTPUT_DIR="output/speedup_test_aime25"
+OUTPUT_DIR="output/speedup_test_aime25_r1"
 
 # =============================================================================
 # TEST PARAMETERS
 # =============================================================================
 
-NUM_PROBLEMS=5       # Number of problems from AIME25 to test
+NUM_PROBLEMS=1       # Number of problems from AIME25 to test
 NUM_RUNS=5           # Number of runs per problem
-MAX_NEW_TOKENS=2048  # Maximum tokens to generate
+MAX_NEW_TOKENS=32768  # Maximum tokens to generate
 TEMPERATURE=0.6      # Sampling temperature
 TOP_P=0.95           # Nucleus sampling parameter
 TOP_K=20             # Top-k filtering parameter
@@ -52,7 +52,7 @@ echo "  - TP size: $TP_SIZE"
 echo "=================================="
 echo ""
 
-python speedup_test_aime25.py \
+python r2r_speedup_test_aime25.py \
     --baseline_model_path "$BASELINE_MODEL_PATH" \
     --router_path "$ROUTER_PATH" \
     --num_problems $NUM_PROBLEMS \
@@ -64,7 +64,7 @@ python speedup_test_aime25.py \
     --tp_size $TP_SIZE \
     --threshold $THRESHOLD \
     --output_dir "$OUTPUT_DIR" \
-    --test_mode both
+    --test_mode r2r
 
 echo ""
 echo "=================================="
