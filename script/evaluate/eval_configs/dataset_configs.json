@@ -100,6 +100,17 @@
         "prompt_template": "{question}",
         "description": "LiveCodeBench dataset"
     },
+    "livecodebench_v5": {
+        "name": "LiveCodeBench V5 (local JSONL + test files)",
+        "path": "data/livecodebench_v5.jsonl",
+        "answer_type": "livecodebench_v5",
+        "id_field": "question_id",
+        "question_field": "prompt",
+        "answer_field": "tests",
+        "tests_dir": "data/livecodebench_v5_tests",
+        "prompt_template": "{question}",
+        "description": "LiveCodeBench v5 dataset loaded from local JSONL with test files from QwQ process_data.py"
+    },
     "mmlu-pro_strange":{
         "name": "MMLU-Pro",
         "path": "GY2233/mmlu-pro-strange",

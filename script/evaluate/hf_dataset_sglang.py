@@ -841,6 +841,24 @@ def preprocess_dataset(dataset, dataset_config: Dict, save_result_dir: str) -> L
                 'outputs': processed_item["outputs"],
                 "fn_name": json.loads(item["metadata"]).get("func_name", None),
             }
+
+        elif dataset_config.get("answer_type") == "livecodebench_v5":
+            processed_item['__index'] = idx
+            processed_item["__few_shots"] = False
+            # Prompt is already fully formatted in the JSONL
+            processed_item["FormattedProblem"] = item["prompt"]
+            # Load test cases from local test files (downloaded by QwQ process_data.py)
+            tests_dir = dataset_config.get("tests_dir", "data/livecodebench_v5_tests")
+            test_fname = item["tests"]["fname"]
+            test_path = os.path.join(tests_dir, test_fname)
+            with open(test_path) as tf:
+                test_data = json.load(tf)
+            io_data = json.loads(test_data["input_output"])
+            processed_item['Answer'] = {
+                'inputs': io_data["inputs"],
+                'outputs': io_data["outputs"],
+                "fn_name": io_data.get("fn_name", None),
+            }
         
         else:
             # For non-multiple-choice, just use the prompt template if available
@@ -1203,7 +1221,7 @@ def main():
 
         overall_accuracy = df['is_correct'].mean()
         print("\noverall accuracyll accuracy: {:.2%}".format(overall_accuracy))
-    if args.dataset_config_dict.get("answer_type") == "livecodebench":
+    if args.dataset_config_dict.get("answer_type") in ("livecodebench", "livecodebench_v5"):
         print("evaluate livecodebench results")
         combined_results_path = f"{args.output_dir}/combined_results.csv"
         if os.path.exists(combined_results_path):
