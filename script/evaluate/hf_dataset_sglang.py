@@ -1067,11 +1067,18 @@ def main():
     
     # Load and preprocess dataset
     print(f"Loading dataset: {args.dataset} from {args.dataset_path}")
-    if args.dataset_config:
-        print(f"Using dataset config: {args.dataset_config}")
-        dataset = load_dataset(args.dataset_path, args.dataset_config, trust_remote_code=True)
+    if args.dataset_path.endswith(('.jsonl', '.json')):
+        if args.dataset_config:
+            print(f"Using dataset config: {args.dataset_config}")
+            dataset = load_dataset("json", data_files=args.dataset_path, name=args.dataset_config, trust_remote_code=True)
+        else:
+            dataset = load_dataset("json", data_files=args.dataset_path, trust_remote_code=True)
     else:
-        dataset = load_dataset(args.dataset_path, trust_remote_code=True)
+        if args.dataset_config:
+            print(f"Using dataset config: {args.dataset_config}")
+            dataset = load_dataset(args.dataset_path, args.dataset_config, trust_remote_code=True)
+        else:
+            dataset = load_dataset(args.dataset_path, trust_remote_code=True)
     
     print(f"Preprocessing dataset as {args.dataset_config_dict['name']}")
         

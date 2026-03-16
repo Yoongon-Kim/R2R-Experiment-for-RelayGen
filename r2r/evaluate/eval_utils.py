@@ -481,6 +481,7 @@ def get_answer_extractor(dataset_type: str) -> Callable:
         "boxed": extract_boxed_answer,
         "multiple_choice": extract_multiple_choice_answer,
         "livecodebench": dummy_extract_code_answer,
+        "livecodebench_v5": dummy_extract_code_answer,
         "mmlu-multiple-choice": extract_mmlu_pro_answer
     }
     

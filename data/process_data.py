@@ -198,3 +198,7 @@ if __name__ == "__main__":
         # save test cases
         with open(Path(output_livecodebench_v5_tests_dir) / f"{global_id}.json", "w") as f:
             json.dump(inputs_outputs, f)
+
+    with open("./data/livecodebench_v5.jsonl", "w") as f:
+        for item in livecodebench_v5_dataset:
+            f.write(json.dumps(item) + "\n")
